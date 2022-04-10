@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- link for google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="confess.css">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <section class="container">
+        <div class="wave"></div>
+    </section>
+
+
+    
+    <div class="authdiv">
+        <div class="authpic">
+          <img src="night.png" alt="">
+        </div>
+        <div class="authdata">
+        <input type="text" id="username" placeholder="username....">
+        <input type="text" id="password" placeholder="password....">
+
+        <div class="buttons">
+            <button id="login">login</button>
+            <button id="create">create</button>
+        </div>
+        </div>
+    </div>
+
+    <div class="chatdiv">
+        <div class="maindiv">
+            <div class="mainlink">
+                <div class="link"></div>
+                <button id="logout">logout</button>
+            </div>
+
+            <div class="upload">
+                <div class="uploaded"></div>
+                <div class="data">
+                    <label for="fromdevicefiles" class="fromdevice">
+                        <input type="file" name="" id="fromdevicefiles" multiple>
+                        <img src="images\attachments.png" id="upload" alt="">
+                    </label>
+                    <input type="text" name="" id="txt">
+                    <div class="send">
+                        <img src="images\send.png" alt="send">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { collection, addDoc, query, where, onSnapshot, orderBy, getFirestore } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuyy7N4ZIsM9Mu0d0iAS4F0etPZdsKXvc",
+            authDomain: "authe-5058a.firebaseapp.com",
+            projectId: "authe-5058a",
+            storageBucket: "authe-5058a.appspot.com",
+            messagingSenderId: "572478168994",
+            appId: "1:572478168994:web:7ddbdc40a3a9d086a7dcfb",
+            measurementId: "G-HXL6E5X054"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        // Initialize Cloud Firestore and get a reference to the service
+        const db = getFirestore(app);
+
+
+        var username = document.getElementById("username")
+        var password = document.getElementById("password")
+        var signin = document.getElementById("login")
+        var signup = document.getElementById("create")
+        var logout = document.getElementById("logout")
+
+        signup.addEventListener('click', function () {
+            createUserWithEmailAndPassword(auth, username.value, password.value)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    console.log("created")
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log(error)
+                });
+        })
+
+        signin.addEventListener('click', function () {
+            signInWithEmailAndPassword(auth, username.value, password.value)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    console.log("logged in")
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log(errorMessage)
+                });
+        })
+
+        logout.addEventListener('click', function () {
+            signOut(auth).then(() => {
+                // Sign-out successful.
+                console.log("sign-out successful")
+            }).catch((error) => {
+                // An error happened.
+                console.log(error)
+            });
+        })
+
+
+        //we're done with login, logout and sign-up of new user
+        //now we'll work on how to show chat screen to logged-in user
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in,
+                const uid = user.uid;
+                const useremail = user.email;
+
+                console.log(user)
+
+                //when user is logged-in, we'll hide authentication div
+                document.getElementsByClassName("authdiv")[0].style.display = "none"
+                document.getElementsByClassName("chatdiv")[0].style.display = ""
+                document.getElementsByClassName("link")[0].innerHTML = user.email
+
+                //displaying msgs is not enough, we'll have to display them in order of time
+                const q = query(collection(db, "messages"), orderBy("time", "asc"));
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            // console.log("New city: ", change.doc.data());
+                            if (change.doc.data().sentby == useremail) {
+                                var msgdiv = document.createElement("div")
+                                msgdiv.className = "chat2"
+                                msgdiv.innerHTML = change.doc.data().value
+                                document.getElementsByClassName("uploaded")[0].appendChild(msgdiv)
+                            }
+                            else {
+                                var msgdiv = document.createElement("div")
+                                var msgdivname = document.createElement("div")
+                                var msg = document.createElement("div")
+                                msgdiv.className = "chat"
+                                msg.innerHTML = change.doc.data().value
+                                msgdivname.innerHTML = change.doc.data().sentby.slice(0, change.doc.data().sentby.length - 10)
+                                //to remove @gmail.com from useremail
+                                document.getElementsByClassName("uploaded")[0].appendChild(msgdiv)
+                                msgdiv.appendChild(msg)
+                                msgdiv.appendChild(msgdivname)
+                            }
+
+                            //this if-else statement colours the chat if it is sent by us o the other person, accordingly
+                        }
+                        if (change.type === "modified") {
+                            console.log("Modified city: ", change.doc.data());
+                        }
+                        if (change.type === "removed") {
+                            console.log("Removed city: ", change.doc.data());
+                        }
+                    });
+                });
+
+
+                //on clicking send button, msg will be sent to database...
+                document.getElementsByClassName("send")[0].addEventListener('click', async function () {
+                    var time = new Date().getTime();
+                    const docRef = await addDoc(collection(db, "messages"), {
+                        //collection name: messages
+                        value: document.getElementById("txt").value,
+                        time: time,
+                        sentby: useremail
+                    });
+                    //after msg is sent in database, we'll clear the input field
+                    document.getElementById("txt").value = ""
+                })
+
+            } else {
+                // User is signed out
+                console.log("signed out")
+                document.getElementsByClassName("authdiv")[0].style.display = ""
+                document.getElementsByClassName("chatdiv")[0].style.display = "none"
+
+            }
+        });
+    </script>
+</body>
+
+</html>
