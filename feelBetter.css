@@ -1,0 +1,75 @@
+/*
+* font-family: 'Open Sans', sans-serif;
+* font-family: 'Poppins', sans-serif;
+* font-family: 'Sacramento', cursive;
+* font-family: 'Lato', sans-serif;
+*/
+
+body{
+    padding: 0;
+    margin: 0;
+    color: aliceblue;
+    font-family: 'Lato', sans-serif;
+}
+#bg{
+    background-image: url(Assets/Bg.jpeg);
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    left:0;
+    top:0;
+    margin-top: 0;
+    z-index: -999;
+}
+nav{
+    display: flex;
+    float: right;
+    text-decoration: none;
+    position: sticky;
+    top: 0;
+}
+li{
+    margin: 1% 5%;
+    /* float: right; */
+    display: inline;
+    position: relative;
+    right: 30%;
+    font-size: 1.2rem;
+}
+li:hover{
+    color: yellow;
+    cursor: pointer;
+}
+a{
+    color: aliceblue;
+    text-decoration: none;
+      margin: 1% 5%;
+    /* float: right; */
+    display: inline;
+    position: relative;
+    right: 30%;
+    font-size: 1.2rem;
+}
+.Content{
+    padding: 2% 8%;
+    background-color: rgba(0, 0, 0, 0.452);
+}
+.Focus{
+    margin-top: 10vh;
+}
+.Question{
+    font-size: 3rem;
+    font-weight: bolder;
+}
+.Title{
+    font-size: 2.5rem;
+    font-weight: bolder;
+}
+.Intro{
+    font-size: 1.2rem;
+}
+.SubHeading{
+    font-size: 1.5rem;
+    font-weight: bolder
+}
